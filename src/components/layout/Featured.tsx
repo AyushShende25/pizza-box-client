@@ -2,6 +2,7 @@ import MargheritaImg from "@/assets/margherita.png";
 import PizzaCard from "@/components/PizzaCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router";
 
 const featuredPizzas = [
 	{
@@ -62,14 +63,15 @@ function Featured() {
 					<PizzaCard key={pizza.id} />
 				))}
 			</div>
-
-			<Button
-				variant={"outline"}
-				className="text-primary border-primary hover:bg-primary hover:text-white"
-				size="lg"
-			>
-				View Full Menu
-			</Button>
+			<Link to="/menu">
+				<Button
+					variant={"outline"}
+					className="text-primary border-primary hover:bg-primary hover:text-white"
+					size="lg"
+				>
+					View Full Menu
+				</Button>
+			</Link>
 		</section>
 	);
 }

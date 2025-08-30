@@ -2,6 +2,7 @@ import { Clock, Flame, Star, Truck } from "lucide-react";
 import HeroImg from "@/assets/hero.png";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router";
 
 function Hero() {
 	return (
@@ -30,14 +31,16 @@ function Hero() {
 						>
 							Order Now
 						</Button>
-						<Button
-							variant="outline"
-							size="lg"
-							className="text-lg cursor-pointer"
-							aria-label="View our menu"
-						>
-							View Menu
-						</Button>
+						<Link to="/menu">
+							<Button
+								variant="outline"
+								size="lg"
+								className="text-lg cursor-pointer"
+								aria-label="View our menu"
+							>
+								View Menu
+							</Button>
+						</Link>
 					</div>
 
 					{/* FEATURES */}
