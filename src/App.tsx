@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router";
 import Home from "@/pages/Home";
 import DefaultLayout from "./layouts/DefaultLayout";
+import Cart from "./pages/Cart";
 import Menu from "./pages/Menu";
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
 			<Route element={<DefaultLayout />}>
 				<Route path="/" element={<Home />} />
 				<Route path="/menu" element={<Menu />} />
+				<Route path="/cart" element={<Cart />} />
 			</Route>
 		</Routes>
 	);

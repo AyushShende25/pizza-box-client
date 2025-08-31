@@ -1,8 +1,8 @@
 import { Clock, Flame, Star, Truck } from "lucide-react";
+import { Link } from "react-router";
 import HeroImg from "@/assets/hero.png";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
 
 function Hero() {
 	return (

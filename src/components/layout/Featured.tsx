@@ -1,8 +1,8 @@
+import { Link } from "react-router";
 import MargheritaImg from "@/assets/margherita.png";
 import PizzaCard from "@/components/PizzaCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
 
 const featuredPizzas = [
 	{
