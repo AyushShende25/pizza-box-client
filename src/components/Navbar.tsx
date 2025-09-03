@@ -1,5 +1,6 @@
 import { ShoppingCart, User } from "lucide-react";
 import { NavLink } from "react-router";
+import { useLogout, useMe } from "@/api/authApi";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,9 +9,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "./ui/skeleton";
 
 function Navbar() {
-	const auth = true;
+	const logout = useLogout();
+	const { data: user, isPending } = useMe();
 
 	return (
 		<nav className="border-b sticky top-0 z-50  backdrop-blur">
@@ -29,7 +32,9 @@ function Navbar() {
 							</span>
 						</div>
 					</NavLink>
-					{auth ? (
+					{isPending ? (
+						<Skeleton className="size-12 rounded-full" />
+					) : user ? (
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button variant="ghost" size="icon">
@@ -38,12 +43,14 @@ function Navbar() {
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
 								<DropdownMenuItem asChild>
-									<NavLink to="/profile">Profile</NavLink>
+									<NavLink to="/address">Manage Addresses</NavLink>
 								</DropdownMenuItem>
 								<DropdownMenuItem asChild>
 									<NavLink to="/orders">My Orders</NavLink>
 								</DropdownMenuItem>
-								<DropdownMenuItem>Logout</DropdownMenuItem>
+								<DropdownMenuItem onClick={() => logout.mutate()}>
+									Logout
+								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					) : (

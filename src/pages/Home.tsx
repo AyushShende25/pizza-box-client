@@ -1,7 +1,7 @@
-import Featured from "@/components/layout/Featured";
-import Features from "@/components/layout/Features";
-import Hero from "@/components/layout/Hero";
-import Testimonials from "@/components/layout/Testimonials";
+import Featured from "@/components/Featured";
+import Features from "@/components/Features";
+import Hero from "@/components/Hero";
+import Testimonials from "@/components/Testimonials";
 
 function Home() {
 	return (
