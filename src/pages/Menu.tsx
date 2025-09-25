@@ -1,4 +1,6 @@
+import { fetchPizzasQueryOptions } from "@/api/pizzasApi";
 import PizzaCard from "@/components/PizzaCard";
+import PizzaCardSkeleton from "@/components/skeletons/PizzaCardSkeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -11,8 +13,22 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 
 function Menu() {
+	const { ref, inView } = useInView();
+
+	const { data, isFetchingNextPage, hasNextPage, fetchNextPage, isPending } =
+		useInfiniteQuery(fetchPizzasQueryOptions());
+
+	useEffect(() => {
+		if (inView && hasNextPage && !isFetchingNextPage) {
+			fetchNextPage();
+		}
+	}, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
 	return (
 		<section className="px-6 md:px-10 py-8 md:py-16 space-y-14">
 			<div className="text-center space-y-4 max-w-2xl mx-auto">
@@ -61,10 +77,23 @@ function Menu() {
 			</Card>
 
 			<div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 lg:gap-10">
-				{[...Array(10).keys()].map((item) => (
-					<PizzaCard key={item} />
-				))}
+				{isPending
+					? [...Array(8)].map((_, i) => <PizzaCardSkeleton key={i} />)
+					: data?.pages.flatMap((page) =>
+							page.items.map((pizza) => (
+								<PizzaCard key={pizza.id} pizza={pizza} />
+							)),
+						)}
 			</div>
+			<div ref={ref} />
+
+			<p className="bg-muted my-4 py-4 rounded-lg text-center font-semibold">
+				{isFetchingNextPage
+					? "Loading more..."
+					: hasNextPage
+						? "Load Newer"
+						: "Nothing more to load"}
+			</p>
 		</section>
 	);
 }

@@ -1,50 +1,14 @@
 import { Link } from "react-router";
-import MargheritaImg from "@/assets/margherita.png";
 import PizzaCard from "@/components/PizzaCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-const featuredPizzas = [
-	{
-		id: 1,
-		name: "Margherita Supreme",
-		description:
-			"Fresh mozzarella, San Marzano tomatoes, basil, extra virgin olive oil",
-		price: 18.99,
-		rating: 4.8,
-		image: MargheritaImg,
-		category: "veg",
-	},
-	{
-		id: 2,
-		name: "Pepperoni Classic",
-		description: "Premium pepperoni, mozzarella cheese, signature tomato sauce",
-		price: 21.99,
-		rating: 4.9,
-		image: MargheritaImg,
-		category: "veg",
-	},
-	{
-		id: 3,
-		name: "Truffle Deluxe",
-		description: "Black truffle, wild mushrooms, ricotta, arugula, truffle oil",
-		price: 28.99,
-		rating: 4.7,
-		image: MargheritaImg,
-		category: "veg",
-	},
-	{
-		id: 3,
-		name: "Truffle Deluxe",
-		description: "Black truffle, wild mushrooms, ricotta, arugula, truffle oil",
-		price: 28.99,
-		rating: 4.7,
-		image: MargheritaImg,
-		category: "veg",
-	},
-];
+import { useQuery } from "@tanstack/react-query";
+import { fetchfeaturedPizzasQueryOptions } from "@/api/pizzasApi";
+import PizzaCardSkeleton from "./skeletons/PizzaCardSkeleton";
 
 function Featured() {
+	const { data, isPending } = useQuery(fetchfeaturedPizzasQueryOptions());
+
 	return (
 		<section className="text-center px-6 md:px-10 py-8 md:py-16 space-y-8">
 			<div className="space-y-4">
@@ -59,9 +23,11 @@ function Featured() {
 			</div>
 
 			<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-				{featuredPizzas.map((pizza) => (
-					<PizzaCard key={pizza.id} />
-				))}
+				{isPending
+					? [...Array(4)].map((_, i) => <PizzaCardSkeleton key={i} />)
+					: data?.items
+							.slice(0, 4)
+							.map((pizza) => <PizzaCard key={pizza.id} pizza={pizza} />)}
 			</div>
 			<Link to="/menu">
 				<Button
