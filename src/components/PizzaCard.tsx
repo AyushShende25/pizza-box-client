@@ -9,11 +9,14 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import type { Pizza } from "@/types/pizza";
+import PizzaOptionsModal from "@/components/PizzaOptionsModal";
+import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 
 function PizzaCard({ pizza }: { pizza: Pizza }) {
 	if (!pizza) {
 		return <p>No Pizza</p>;
 	}
+
 	return (
 		<Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ">
 			<CardHeader className="relative">
@@ -49,10 +52,15 @@ function PizzaCard({ pizza }: { pizza: Pizza }) {
 					</span>
 				</div>
 				<div>
-					<Button className="w-full cursor-pointer">
-						<ShoppingCart />
-						<span>Add to Cart</span>
-					</Button>
+					<Sheet>
+						<SheetTrigger asChild>
+							<Button className="w-full cursor-pointer">
+								<ShoppingCart />
+								<span>Add to Cart</span>
+							</Button>
+						</SheetTrigger>
+						<PizzaOptionsModal pizza={pizza} />
+					</Sheet>
 				</div>
 			</CardContent>
 		</Card>
