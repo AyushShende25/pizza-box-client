@@ -24,13 +24,14 @@ function PizzaOptionsModal({
 	pizza: {
 		name,
 		description,
+		base_price,
 		id: pizzaId,
-		base_price: basePrice,
 		default_toppings: defaultToppings,
 	},
 }: {
 	pizza: Pizza;
 }) {
+	const basePrice = Number(base_price);
 	const { data: crusts, isPending: crustsLoading } = useFetchCrusts();
 	const { data: sizes, isPending: sizesLoading } = useFetchSizes();
 	const { data: toppings, isPending: toppingsLoading } = useFetchToppings();

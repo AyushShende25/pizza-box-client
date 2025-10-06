@@ -4,10 +4,11 @@ export type Pizza = {
 	id: string;
 	name: string;
 	description: string;
-	base_price: number;
+	base_price: string;
 	image_url: string;
 	is_available: boolean;
 	category: PizzaCategory;
+	featured: boolean;
 	default_toppings: Topping[];
 	created_at: string;
 	updated_at: string;

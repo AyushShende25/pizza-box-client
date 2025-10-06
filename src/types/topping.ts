@@ -16,11 +16,11 @@ export type ToppingType = (typeof TOPPING_TYPE)[keyof typeof TOPPING_TYPE];
 export type Topping = {
 	id: string;
 	name: string;
-	price: number;
+	price: string;
 	description: string;
 	category: ToppingCategory;
 	is_vegetarian: boolean;
 	is_available: boolean;
-	image_url: string;
+	image_url: string | null;
 	created_at: string;
 };

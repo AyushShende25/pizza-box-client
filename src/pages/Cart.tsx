@@ -1,4 +1,4 @@
-import { CreditCard, DollarSign } from "lucide-react";
+import { CreditCard, DollarSign, Trash2 } from "lucide-react";
 import CartCard from "@/components/CartCard";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,23 +18,57 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-
+import { useClearCart, useFetchCart } from "@/api/cartApi";
+import { CartCardSkeleton } from "@/components/skeletons/CartCardSkeleton";
+import { OrderSummarySkeleton } from "@/components/skeletons/OrderSummarySkeleton";
+import emptyCart from "@/assets/empty_cart.svg";
+import { Link } from "react-router";
 function Cart() {
+	const { data, isPending: cartLoading } = useFetchCart();
+	const { mutate: clearCartMutation, isPending } = useClearCart();
+
+	if (!cartLoading && data?.cart_items && data.cart_items.length < 1) {
+		return (
+			<div className="flex flex-col items-center justify-center py-10 md:py-16 gap-10">
+				<div className="flex flex-col items-center justify-center gap-4">
+					<h3 className="text-4xl md:text-5xl font-medium">
+						Your cart is Empty
+					</h3>
+					<Link to={"/menu"}>
+						<Button>Explore our menu</Button>
+					</Link>
+				</div>
+				<div className="max-w-md">
+					<img src={emptyCart} alt="empty-cart" />
+				</div>
+			</div>
+		);
+	}
 	return (
 		<section className="px-6 md:px-10 py-8 md:py-16 space-y-8">
 			<h1 className="text-3xl lg:text-4xl font-bold tracking-tight">
 				Cart Items
 			</h1>
-			<div className="grid md:grid-cols-2 gap-12 lg:grid-cols-5">
+
+			<div className="grid md:grid-cols-2 gap-12 lg:grid-cols-5 justify-center">
 				{/* Cart Cards */}
 				<div className="lg:col-span-3 space-y-6">
-					<CartCard />
-					<CartCard />
-					<CartCard />
-					<CartCard />
-					<CartCard />
+					{cartLoading
+						? [...Array(8)].map((_, i) => <CartCardSkeleton key={i} />)
+						: data?.cart_items.map((item) => (
+								<CartCard key={item.id} cartItem={item} />
+							))}
+					<div className="hidden md:block text-center">
+						<Button
+							variant="outline"
+							className="cursor-pointer w-full"
+							onClick={() => clearCartMutation()}
+							disabled={isPending}
+						>
+							<Trash2 /> <span>Clear Cart</span>
+						</Button>
+					</div>
 				</div>
-
 				{/* Billing */}
 				<div className="lg:col-span-2">
 					<Card>
@@ -45,25 +79,31 @@ function Cart() {
 
 						<CardContent className="space-y-4">
 							{/* Billing */}
-							<div className="space-y-3">
-								<div className="flex justify-between">
-									<p>Subtotal</p>
-									<p>$20</p>
+							{cartLoading ? (
+								<OrderSummarySkeleton />
+							) : (
+								<div className="space-y-3">
+									<div className="flex justify-between">
+										<p>Subtotal</p>
+										<p>₹{data?.subtotal}</p>
+									</div>
+									<div className="flex justify-between">
+										<p>Delivery fee</p>
+										<p>₹{data?.delivery_charge}</p>
+									</div>
+									<div className="flex justify-between">
+										<p>Tax</p>
+										<p>₹{data?.tax}</p>
+									</div>
+									<Separator />
+									<div className="flex justify-between">
+										<p className="text-lg font-semibold">Total</p>
+										<p className="font-semibold text-lg text-primary">
+											₹{data?.total}
+										</p>
+									</div>
 								</div>
-								<div className="flex justify-between">
-									<p>Delivery fee</p>
-									<p>$8</p>
-								</div>
-								<div className="flex justify-between">
-									<p>Tax</p>
-									<p>$2</p>
-								</div>
-								<Separator />
-								<div className="flex justify-between">
-									<p className="text-lg font-semibold">Total</p>
-									<p className="font-semibold text-lg text-primary">$30</p>
-								</div>
-							</div>
+							)}
 
 							<Separator />
 
@@ -109,7 +149,7 @@ function Cart() {
 
 							<Button size="lg" className="w-full cursor-pointer">
 								<span className="text-lg">Place Order -</span>
-								<span className="text-lg">$30</span>
+								<span className="text-lg">₹{data?.total}</span>
 							</Button>
 						</CardContent>
 						<CardFooter>
@@ -118,6 +158,11 @@ function Cart() {
 							</p>
 						</CardFooter>
 					</Card>
+				</div>
+				<div className="-mt-4 md:hidden">
+					<Button variant="outline" className="cursor-pointer w-full">
+						<Trash2 /> <span>Clear Cart</span>
+					</Button>
 				</div>
 			</div>
 		</section>
