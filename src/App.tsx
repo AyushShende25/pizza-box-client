@@ -30,8 +30,8 @@ function App() {
 						<Route path="/cart" element={<Cart />} />
 						<Route element={<ProtectedLayout />}>
 							<Route path="/orders" element={<Orders />} />
+							<Route path="/address" element={<Address />} />
 						</Route>
-						<Route path="/address" element={<Address />} />
 					</Route>
 					<Route element={<AuthLayout />}>
 						<Route path="/login" element={<Login />} />
