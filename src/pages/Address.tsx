@@ -10,7 +10,9 @@ function Address() {
 			<div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 lg:gap-10">
 				{isPending
 					? [...Array(5)].map((_, i) => <PizzaCardSkeleton key={i} />)
-					: addresses?.map((add) => <AddressCard key={add.id} address={add} />)}
+					: addresses
+							?.sort((a, b) => Number(b.is_default) - Number(a.is_default))
+							.map((add) => <AddressCard key={add.id} address={add} />)}
 				<CreateAddressCard />
 			</div>
 		</section>

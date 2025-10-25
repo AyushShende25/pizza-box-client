@@ -8,21 +8,26 @@ import { useEffect, useState } from "react";
 import useDebounce from "@/hooks/useDebounce";
 
 function CartCard({
-	cartItem: { pizza, size, crust, total, quantity, id },
+	cartItem: { pizza, size, crust, total, quantity, id, toppings },
 }: {
 	cartItem: CartItem;
 }) {
 	const [numItems, setNumItems] = useState(quantity);
 
-	const { mutate: removeItemMutation, isPending: removeCartPending } =
-		useRemoveItemFromCart();
-	const { mutate: updateCartMutation, isPending: updateCartPending } =
-		useUpdateCartQuantity();
+	const removeItemMutation = useRemoveItemFromCart();
+	const updateCartMutation = useUpdateCartQuantity();
 	const debouncedQuantity = useDebounce(numItems);
 
 	useEffect(() => {
+		setNumItems(quantity);
+	}, [quantity]);
+
+	useEffect(() => {
 		if (debouncedQuantity !== quantity) {
-			updateCartMutation({ itemId: id, quantity: debouncedQuantity });
+			updateCartMutation.mutateAsync({
+				itemId: id,
+				quantity: debouncedQuantity,
+			});
 		}
 	}, [debouncedQuantity]);
 
@@ -42,16 +47,23 @@ function CartCard({
 						size="icon"
 						variant="ghost"
 						className="text-muted-foreground hover:text-destructive cursor-pointer"
-						onClick={() => removeItemMutation(id)}
-						disabled={removeCartPending}
+						onClick={() => removeItemMutation.mutate(id)}
+						disabled={removeItemMutation.isPending}
 					>
 						<Trash2 />
 					</Button>
 				</div>
 				<div className="text-sm text-muted-foreground">{pizza.description}</div>
 				<div className="flex gap-2 flex-wrap">
-					<Badge>{size.display_name}</Badge>
-					<Badge>{crust.name}</Badge>
+					<Badge variant={"secondary"}>{size.display_name}</Badge>
+					<Badge variant={"secondary"}>{crust.name}</Badge>
+				</div>
+				<div className="flex gap-2 flex-wrap">
+					{toppings?.map((topping) => (
+						<Badge variant={"outline"} key={topping.id}>
+							{topping.name}
+						</Badge>
+					))}
 				</div>
 				<div className="flex justify-between items-center">
 					<div className="flex gap-3 items-center">
@@ -60,7 +72,7 @@ function CartCard({
 							onClick={() => setNumItems((prev) => Math.max(1, prev - 1))}
 							variant={"outline"}
 							size="icon"
-							disabled={numItems <= 1 || updateCartPending}
+							disabled={numItems <= 1 || updateCartMutation.isPending}
 						>
 							<Minus />
 						</Button>
@@ -70,7 +82,7 @@ function CartCard({
 							onClick={() => setNumItems((prev) => prev + 1)}
 							variant={"outline"}
 							size="icon"
-							disabled={updateCartPending}
+							disabled={updateCartMutation.isPending}
 						>
 							<Plus />
 						</Button>

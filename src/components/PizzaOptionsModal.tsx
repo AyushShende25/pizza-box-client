@@ -70,11 +70,11 @@ function PizzaOptionsModal({
 		}
 	}, [sizes, crusts, selectedSizeId, selectedCrustId]);
 
-	const { mutate: addToCart, isPending } = useAddToCart();
+	const addToCartMutation = useAddToCart();
 
-	const handleAddToCart = () => {
+	const handleAddToCart = async () => {
 		if (!selectedSizeId || !selectedCrustId) return;
-		addToCart({
+		await addToCartMutation.mutateAsync({
 			pizzaId,
 			sizeId: selectedSizeId,
 			crustId: selectedCrustId,
@@ -319,24 +319,34 @@ function PizzaOptionsModal({
 				</div>
 				<div className="flex gap-2">
 					<SheetClose asChild>
-						<Button variant="outline" className="flex-1" disabled={isPending}>
+						<Button
+							variant="outline"
+							className="flex-1"
+							disabled={addToCartMutation.isPending}
+						>
 							Cancel
 						</Button>
 					</SheetClose>
-					<Button
-						onClick={handleAddToCart}
-						className="flex-1"
-						disabled={!selectedSizeId || !selectedCrustId || isPending}
-					>
-						{isPending ? (
-							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								Adding...
-							</>
-						) : (
-							"Add to Cart"
-						)}
-					</Button>
+					<SheetClose asChild>
+						<Button
+							onClick={handleAddToCart}
+							className="flex-1"
+							disabled={
+								!selectedSizeId ||
+								!selectedCrustId ||
+								addToCartMutation.isPending
+							}
+						>
+							{addToCartMutation.isPending ? (
+								<>
+									<Loader2 className="mr-2 size-4 animate-spin" />
+									Adding...
+								</>
+							) : (
+								"Add to Cart"
+							)}
+						</Button>
+					</SheetClose>
 				</div>
 			</SheetFooter>
 		</SheetContent>

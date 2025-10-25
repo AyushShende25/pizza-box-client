@@ -7,6 +7,7 @@ import type { LoginFormType } from "@/pages/Login";
 import type { RegisterFormType } from "@/pages/Register";
 import type { ResetPasswordFormType } from "@/pages/ResetPassword";
 import type { User } from "@/types/user";
+import { useMergeCart } from "./cartApi";
 
 export const authApi = {
 	register: async (registerFormData: RegisterFormType) => {
@@ -111,11 +112,13 @@ export function useResendToken() {
 export function useLogin() {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const mergeCartMutation = useMergeCart();
 	return useMutation({
 		mutationFn: (data: LoginFormType) => authApi.login(data),
-		onSuccess: () => {
+		onSuccess: async () => {
 			queryClient.invalidateQueries({ queryKey: ["me"] });
 			navigate("/");
+			(await mergeCartMutation).mutateAsync();
 		},
 	});
 }

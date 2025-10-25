@@ -46,6 +46,13 @@ function Cart() {
 	}
 	return (
 		<section className="px-6 md:px-10 py-8 md:py-16 space-y-8">
+			<Button
+				className="cursor-pointer text-primary border-primary hover:bg-primary-foreground hover:text-primary/90"
+				variant={"outline"}
+				asChild
+			>
+				<Link to={"/menu"}>Back to Menu</Link>
+			</Button>
 			<h1 className="text-3xl lg:text-4xl font-bold tracking-tight">
 				Cart Items
 			</h1>
