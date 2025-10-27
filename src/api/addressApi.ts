@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { api } from "./axios";
 import type { Address } from "@/types/address";
-import type { CreateAddressInput } from "@/components/CreateAddressCard";
+import type { CreateAddressInput } from "@/components/CreateAddressForm";
 
 export const addressApi = {
 	fetchAddresses: async (): Promise<Address[]> => {
