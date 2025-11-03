@@ -1,5 +1,4 @@
-import { MapPin, Phone } from "lucide-react";
-import MargheritaImg from "@/assets/margherita.png";
+import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
 	Card,
@@ -10,70 +9,82 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ORDER_STATUS, type Order } from "@/types/orders";
 
-function OrderCard() {
+function OrderCard({ order }: { order: Order }) {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Order #PZ001234</CardTitle>
-				<CardDescription>July 25, 2025</CardDescription>
+				<CardTitle>Order {order?.order_no}</CardTitle>
+				<CardDescription>
+					{new Date(order.created_at).toLocaleDateString("en-US", {
+						weekday: "long",
+						year: "numeric",
+						month: "long",
+						day: "numeric",
+					})}
+				</CardDescription>
 				<CardAction>
-					<Badge>Ordered</Badge>
+					<Badge
+						variant={
+							order.order_status === ORDER_STATUS.DELIVERED
+								? "default"
+								: order.order_status === ORDER_STATUS.CANCELLED
+									? "destructive"
+									: "secondary"
+						}
+						className="capitalize"
+					>
+						{order.order_status}
+					</Badge>
 				</CardAction>
 			</CardHeader>
 			<CardContent className="space-y-4">
-				<div className="flex justify-between items-center">
-					{/* Left side */}
-					<div className="flex gap-3 flex-1">
-						<div className="w-10 h-10 rounded-lg overflow-hidden">
-							<img
-								src={MargheritaImg}
-								className="w-full h-full object-cover"
-								alt=""
-							/>
+				<div className="space-y-3">
+					{order?.order_items?.map((item) => (
+						<div
+							key={item.id}
+							className="flex justify-between items-center border rounded-lg p-3 bg-muted/30"
+						>
+							<div>
+								<p className="font-medium capitalize">{item.pizza_name}</p>
+								<p className="text-sm text-muted-foreground">
+									Qty: {item.quantity} • {item.size_name} • {item.crust_name}
+								</p>
+								{item.toppings.length > 0 && (
+									<p className="text-xs text-muted-foreground mt-1">
+										+ {item.toppings.map((t) => t.topping_name).join(", ")}
+									</p>
+								)}
+							</div>
+							<p className="font-semibold text-sm text-right">
+								₹{item.total_price}
+							</p>
 						</div>
-						<div>
-							<p>Margherita</p>
-							<p className="text-sm text-muted-foreground">Qty: 2</p>
-						</div>
-					</div>
+					))}
+				</div>
 
-					{/* Right side (price) */}
-					<div className="font-semibold">$10</div>
-				</div>
-				<div className="flex justify-between items-center">
-					{/* Left side */}
-					<div className="flex gap-3 flex-1">
-						<div className="w-10 h-10 rounded-lg overflow-hidden">
-							<img
-								src={MargheritaImg}
-								className="w-full h-full object-cover"
-								alt=""
-							/>
-						</div>
-						<div>
-							<p>Margherita</p>
-							<p className="text-sm text-muted-foreground">Qty: 2</p>
-						</div>
-					</div>
+				<Separator />
 
-					{/* Right side (price) */}
-					<div className="font-semibold">$10</div>
-				</div>
-				<Separator />
-				<div className="space-y-2 text-muted-foreground">
-					<div className="flex gap-2 items-center">
-						<MapPin className="w-5 h-5" />
-						<span>123 Main St, New York, NY 10001</span>
-					</div>
-					<div className="flex gap-2 items-center">
-						<Phone className="w-5 h-5" />
-						<span>7354623144</span>
+				{/* Delivery Info */}
+				<div className="text-muted-foreground space-y-1">
+					<div className="flex gap-2 items-start">
+						<MapPin className="size-4 mt-[2px]" />
+						<p className="text-sm leading-snug whitespace-pre-line">
+							{order.delivery_address}
+						</p>
 					</div>
 				</div>
+
 				<Separator />
-				<div className="flex justify-end">
-					<p className="text-lg font-semibold">Total: $20</p>
+
+				{/* Totals */}
+				<div className="text-right space-y-1">
+					<p className="text-sm text-muted-foreground">Tax: ₹{order.tax}</p>
+					<p className="text-sm text-muted-foreground">
+						Delivery: ₹{order.delivery_charge}
+					</p>
+					<p className="text-base font-semibold">Total: ₹{order.total}</p>
 				</div>
 			</CardContent>
 		</Card>

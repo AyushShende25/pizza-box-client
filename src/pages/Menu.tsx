@@ -23,7 +23,6 @@ import { useSearchParams } from "react-router";
 
 function Menu() {
 	let [searchParams, setSearchParams] = useSearchParams();
-	console.log(searchParams);
 	const debouncedSearchValue = useDebounce(searchParams.get("name") ?? "");
 	const { ref, inView } = useInView();
 
