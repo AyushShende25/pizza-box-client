@@ -14,15 +14,7 @@ export const addressApi = {
 		return res.data;
 	},
 	createAddress: async (addressData: CreateAddressInput) => {
-		const res = await api.post("/addresses/", {
-			full_name: addressData.fullName,
-			phone_number: addressData.phoneNumber,
-			street: addressData.street,
-			city: addressData.city,
-			state: addressData.state,
-			postal_code: addressData.postalCode,
-			country: addressData.country,
-		});
+		const res = await api.post("/addresses/", addressData);
 		return res.data;
 	},
 	deleteAddress: async (addressId: string) => {
@@ -30,7 +22,7 @@ export const addressApi = {
 	},
 	updateDefaultAddress: async (addressId: string) => {
 		const res = await api.patch(`/addresses/${addressId}`, {
-			is_default: true,
+			isDefault: true,
 		});
 		return res.data;
 	},
@@ -48,11 +40,11 @@ export function useFetchAddresses() {
 }
 
 export function useCreateAddress() {
-	const querClient = useQueryClient();
+	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: addressApi.createAddress,
 		onSuccess: () => {
-			querClient.invalidateQueries({
+			queryClient.invalidateQueries({
 				queryKey: ["addresses"],
 			});
 		},

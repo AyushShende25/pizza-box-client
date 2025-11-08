@@ -31,10 +31,10 @@ export const pizzasApi = {
 		const query = new URLSearchParams({
 			...(limit && { limit: String(limit) }),
 			...(page !== undefined && { page: String(page) }),
-			...(sortBy && { sort_by: sortBy }),
+			...(sortBy && { sortBy }),
 			...(category && { category }),
 			...(name && { name }),
-			...(isAvailable !== undefined && { is_available: String(isAvailable) }),
+			...(isAvailable !== undefined && { isAvailable: String(isAvailable) }),
 		});
 		const res = await api.get(`/menu/pizzas?${query}`);
 		return res.data;

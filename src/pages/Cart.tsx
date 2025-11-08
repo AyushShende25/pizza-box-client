@@ -14,7 +14,7 @@ import { useClearCart, useFetchCart } from "@/api/cartApi";
 import { CartCardSkeleton } from "@/components/skeletons/CartCardSkeleton";
 import { OrderSummarySkeleton } from "@/components/skeletons/OrderSummarySkeleton";
 import emptyCart from "@/assets/empty_cart.svg";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useFetchAddresses } from "@/api/addressApi";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -30,43 +30,24 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import CreateAddressForm from "@/components/CreateAddressForm";
-import type { Address } from "@/types/address";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useMe } from "@/api/authApi";
 import { Skeleton } from "@/components/ui/skeleton";
-
-function AddressDisplay({ address }: { address: Address }) {
-	if (!address) return null;
-	return (
-		<div className="space-y-1  text-sm py-1">
-			<p className="space-x-1">
-				<span>Delivering to</span>
-				<span className="font-bold">{address.full_name}</span>
-			</p>
-			<p className="space-x-1 text-muted-foreground">
-				<span>{address.street}</span>
-				<span>{address.city}</span>
-			</p>
-			<p className="space-x-1 text-muted-foreground">
-				<span>{address.state}</span>
-				<span>{address.country}</span>
-			</p>
-			<p className="space-x-1 text-muted-foreground">
-				<span>Postal Code: {address.postal_code}</span>
-				<span>Phone: {address.phone_number}</span>
-			</p>
-		</div>
-	);
-}
+import { Input } from "@/components/ui/input";
+import { useCreateOrder } from "@/api/ordersApi";
+import AddressDisplay from "@/components/AddressDisplay";
 
 function Cart() {
 	const { data: cart, isPending: cartLoading } = useFetchCart();
 	const clearCartMutation = useClearCart();
+	const createOrderMutation = useCreateOrder();
 	const { data: addresses, isPending: addressesLoading } = useFetchAddresses();
 	const { data: user, isPending: userPending } = useMe();
+	const [notes, setNotes] = useState<string>("");
+	const navigate = useNavigate();
 
 	const defaultAddress = useMemo(
-		() => addresses?.find((addr) => addr.is_default === true),
+		() => addresses?.find((addr) => addr.isDefault === true),
 		[addresses],
 	);
 	const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
@@ -83,10 +64,36 @@ function Cart() {
 		() => addresses?.find((addr) => addr.id === selectedAddressId),
 		[addresses, selectedAddressId],
 	);
-	const cartItemCount = cart?.item_count ?? 0;
-	const canPlaceOrder = cartItemCount > 0 && selectedAddressId && !cartLoading;
+	const cartItemCount = cart?.itemCount ?? 0;
+	const canPlaceOrder =
+		cartItemCount > 0 &&
+		selectedAddressId &&
+		!cartLoading &&
+		!createOrderMutation.isPending;
 
-	if (!cartLoading && !cart?.cart_items?.length) {
+	const handleCheckout = async () => {
+		if (!selectedAddressId || !cart) return;
+		const orderItems = cart.cartItems.map((item) => ({
+			quantity: item.quantity,
+			pizzaId: item.pizza.id,
+			sizeId: item.size.id,
+			crustId: item.crust.id,
+			toppingsIds: item.toppings.map((t) => t.id),
+		}));
+		try {
+			await createOrderMutation.mutateAsync({
+				orderItems,
+				addressId: selectedAddressId,
+				notes,
+			});
+			await clearCartMutation.mutateAsync();
+			navigate("/orders");
+		} catch (err) {
+			console.error("Order creation failed", err);
+		}
+	};
+
+	if (!cartLoading && !cart?.cartItems?.length) {
 		return (
 			<div className="flex flex-col items-center justify-center py-10 md:py-16 gap-10">
 				<div className="flex flex-col items-center justify-center gap-4">
@@ -121,7 +128,7 @@ function Cart() {
 				<div className="lg:col-span-3 space-y-6">
 					{cartLoading
 						? [...Array(3)].map((_, i) => <CartCardSkeleton key={i} />)
-						: cart?.cart_items.map((item) => (
+						: cart?.cartItems.map((item) => (
 								<CartCard key={item.id} cartItem={item} />
 							))}
 					<div className="hidden md:block text-center">
@@ -184,7 +191,7 @@ function Cart() {
 									</div>
 									<div className="flex justify-between">
 										<p>Delivery fee</p>
-										<p>₹{cart?.delivery_charge}</p>
+										<p>₹{cart?.deliveryCharge}</p>
 									</div>
 									<div className="flex justify-between">
 										<p>Tax</p>
@@ -206,9 +213,6 @@ function Cart() {
 							{userPending ? (
 								<Skeleton />
 							) : !user ? (
-								// <Button variant="link" asChild>
-								// 	<Link to={"/login"}>Login to manage addresses</Link>
-								// </Button>
 								<Alert>
 									<AlertCircle className="size-4" />
 									<AlertDescription>
@@ -322,14 +326,27 @@ function Cart() {
 							)}
 
 							<Separator />
+
+							<div>
+								<p className="text-sm font-semibold pb-2">Notes</p>
+								<Input
+									value={notes}
+									onChange={(e) => setNotes(e.target.value)}
+									placeholder="extra delivery instructions"
+								/>
+							</div>
+
+							<Separator />
+
 							<Button
 								size="lg"
 								className="w-full cursor-pointer"
 								disabled={!canPlaceOrder}
+								onClick={handleCheckout}
 							>
 								<span className="text-lg">
-									{cartLoading
-										? "Processing..."
+									{createOrderMutation.isPending
+										? "Placing your order..."
 										: !selectedAddressId
 											? "Select Address to Continue"
 											: `Place Order - ₹${cart?.total}`}

@@ -21,17 +21,10 @@ import { Drumstick, Leaf, Loader2 } from "lucide-react";
 import PizzaOptionsSkeleton from "@/components/skeletons/PizzaOptionsSkeleton";
 
 function PizzaOptionsModal({
-	pizza: {
-		name,
-		description,
-		base_price,
-		id: pizzaId,
-		default_toppings: defaultToppings,
-	},
+	pizza: { name, description, basePrice, id: pizzaId, defaultToppings },
 }: {
 	pizza: Pizza;
 }) {
-	const basePrice = Number(base_price);
 	const { data: crusts, isPending: crustsLoading } = useFetchCrusts();
 	const { data: sizes, isPending: sizesLoading } = useFetchSizes();
 	const { data: toppings, isPending: toppingsLoading } = useFetchToppings();
@@ -40,8 +33,8 @@ function PizzaOptionsModal({
 		() =>
 			toppings?.filter(
 				(t) =>
-					!defaultToppings.some((d) => d.id === t.id) &&
-					t.is_vegetarian === true,
+					!defaultToppings?.some((d) => d.id === t.id) &&
+					t.isVegetarian === true,
 			) ?? [],
 		[toppings, defaultToppings],
 	);
@@ -50,8 +43,8 @@ function PizzaOptionsModal({
 		() =>
 			toppings?.filter(
 				(t) =>
-					!defaultToppings.some((d) => d.id === t.id) &&
-					t.is_vegetarian === false,
+					!defaultToppings?.some((d) => d.id === t.id) &&
+					t.isVegetarian === false,
 			) ?? [],
 		[toppings, defaultToppings],
 	);
@@ -97,8 +90,8 @@ function PizzaOptionsModal({
 
 		if (selectedSize && selectedCrust) {
 			total =
-				Number(selectedSize.multiplier) * basePrice +
-				Number(selectedCrust.additional_price) +
+				Number(selectedSize.multiplier) * Number(basePrice) +
+				Number(selectedCrust.additionalPrice) +
 				selectedToppingsPrice;
 		}
 
@@ -157,7 +150,8 @@ function PizzaOptionsModal({
 					onValueChange={(v) => setSelectedSizeId(v)}
 				>
 					{sizes?.map((size) => {
-						const additionalPrice = size.multiplier * basePrice - basePrice;
+						const additionalPrice =
+							size.multiplier * Number(basePrice) - Number(basePrice);
 						return (
 							<div
 								key={size.id}
@@ -169,7 +163,7 @@ function PizzaOptionsModal({
 									className="flex-1 cursor-pointer font-normal"
 								>
 									<div className="flex w-full justify-between items-center">
-										<span className="font-medium">{size.display_name}</span>
+										<span className="font-medium">{size.displayName}</span>
 										{additionalPrice > 0 && (
 											<span className="text-sm text-muted-foreground">
 												+₹{additionalPrice.toFixed(0)}
@@ -202,9 +196,9 @@ function PizzaOptionsModal({
 							>
 								<div className="w-full flex justify-between items-center">
 									<span className="font-medium">{crust.name}</span>
-									{Number(crust.additional_price) > 0 && (
+									{Number(crust.additionalPrice) > 0 && (
 										<span className="text-sm text-muted-foreground">
-											+₹{crust.additional_price}
+											+₹{crust.additionalPrice}
 										</span>
 									)}
 								</div>

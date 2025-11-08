@@ -11,20 +11,20 @@ export type CartItem = {
 	size: Size;
 	crust: Crust;
 	toppings: Topping[];
-	created_at: string;
-	updated_at: string;
+	createdAt: string;
+	updatedAt: string;
 };
 
 export type Cart = {
 	id: string;
 	subtotal: string;
 	tax: string;
-	delivery_charge: string;
+	deliveryCharge: string;
 	total: string;
-	cart_items: CartItem[];
-	created_at: string;
-	updated_at: string;
-	item_count: number;
+	cartItems: CartItem[];
+	createdAt: string;
+	updatedAt: string;
+	itemCount: number;
 };
 
 export const TAX_RATE = 0.18;

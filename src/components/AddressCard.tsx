@@ -21,11 +21,11 @@ function AddressCard({ address }: { address: Address }) {
 				<CardTitle>
 					<div className="flex items-center gap-2">
 						<User className="size-4 text-muted-foreground" />
-						<h4 className="text-base font-semibold">{address.full_name}</h4>
+						<h4 className="text-base font-semibold">{address.fullName}</h4>
 					</div>
 				</CardTitle>
 				<CardAction>
-					{address.is_default && (
+					{address.isDefault && (
 						<Badge
 							variant="secondary"
 							className="text-xs font-medium bg-primary/10 text-primary"
@@ -33,7 +33,7 @@ function AddressCard({ address }: { address: Address }) {
 							Default
 						</Badge>
 					)}
-					{!address.is_default && (
+					{!address.isDefault && (
 						<Badge
 							onClick={() => makeDefaultAddressMutation.mutateAsync(address.id)}
 							variant={"outline"}
@@ -54,14 +54,14 @@ function AddressCard({ address }: { address: Address }) {
 							{address.city}, {address.state}
 						</p>
 						<p>
-							{address.country} - {address.postal_code}
+							{address.country} - {address.postalCode}
 						</p>
 					</div>
 				</div>
 
 				<div className="flex items-center gap-2">
 					<Phone className="size-4 text-muted-foreground" />
-					<span>{address.phone_number}</span>
+					<span>{address.phoneNumber}</span>
 				</div>
 			</CardContent>
 			<CardFooter className="absolute right-0 bottom-4">

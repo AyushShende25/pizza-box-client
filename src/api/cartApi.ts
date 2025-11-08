@@ -17,13 +17,7 @@ type AddToCartProps = {
 
 export const cartApi = {
 	addToCart: async (addToCartData: AddToCartProps) => {
-		const res = await api.post("/cart/items", {
-			pizza_id: addToCartData.pizzaId,
-			size_id: addToCartData.sizeId,
-			crust_id: addToCartData.crustId,
-			topping_ids: addToCartData.toppingIds,
-			quantity: addToCartData.quantity,
-		});
+		const res = await api.post("/cart/items", addToCartData);
 		return res.data;
 	},
 	fetchCart: async (): Promise<Cart> => {
@@ -77,7 +71,7 @@ export function useAddToCart() {
 				if (!old) return old;
 				return {
 					...old,
-					item_count: old.item_count + addToCartData.quantity,
+					item_count: old.itemCount + addToCartData.quantity,
 				};
 			});
 
@@ -102,7 +96,7 @@ export function useUpdateCartQuantity() {
 
 			queryClient.setQueryData<Cart>(["cart"], (old) => {
 				if (!old) return old;
-				const updatedItems = old.cart_items.map((item) => {
+				const updatedItems = old.cartItems.map((item) => {
 					if (item.id === itemId) {
 						const unitPrice = Number(item.total) / item.quantity;
 						const newTotal = unitPrice * quantity;
@@ -125,7 +119,7 @@ export function useUpdateCartQuantity() {
 				);
 
 				const tax = subtotal * TAX_RATE;
-				const total = subtotal + Number(old.delivery_charge) + tax;
+				const total = subtotal + Number(old.deliveryCharge) + tax;
 
 				return {
 					...old,
@@ -158,18 +152,18 @@ export function useRemoveItemFromCart() {
 
 			queryClient.setQueryData<Cart>(["cart"], (old) => {
 				if (!old) return old;
-				const updatedItems = old.cart_items.filter((i) => i.id !== itemId);
-				const removedItem = old.cart_items.find((i) => i.id === itemId);
+				const updatedItems = old.cartItems.filter((i) => i.id !== itemId);
+				const removedItem = old.cartItems.find((i) => i.id === itemId);
 				const subtotal = updatedItems.reduce(
 					(sum, item) => sum + Number(item.total ?? 0),
 					0,
 				);
 				const tax = subtotal * TAX_RATE;
-				const total = subtotal + Number(old.delivery_charge) + tax;
+				const total = subtotal + Number(old.deliveryCharge) + tax;
 				return {
 					...old,
 					cart_items: updatedItems,
-					item_count: old.item_count - (removedItem?.quantity ?? 0),
+					item_count: old.itemCount - (removedItem?.quantity ?? 0),
 					subtotal: subtotal.toFixed(2),
 					tax: tax.toFixed(2),
 					total: total.toFixed(2),

@@ -36,7 +36,7 @@ function CartCard({
 			<div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg">
 				<img
 					className="w-full h-full object-cover"
-					src={pizza.image_url}
+					src={pizza.imageUrl}
 					alt={pizza.name}
 				/>
 			</div>
@@ -55,7 +55,7 @@ function CartCard({
 				</div>
 				<div className="text-sm text-muted-foreground">{pizza.description}</div>
 				<div className="flex gap-2 flex-wrap">
-					<Badge variant={"secondary"}>{size.display_name}</Badge>
+					<Badge variant={"secondary"}>{size.displayName}</Badge>
 					<Badge variant={"secondary"}>{crust.name}</Badge>
 				</div>
 				<div className="flex gap-2 flex-wrap">

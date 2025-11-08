@@ -31,7 +31,7 @@ function PizzaCard({ pizza }: { pizza: Pizza }) {
 				<div className="max-w-2/3 mx-auto mb-2">
 					<img
 						className="w-full object-cover"
-						src={pizza.image_url}
+						src={pizza.imageUrl}
 						alt={pizza.name}
 					/>
 				</div>
@@ -48,7 +48,7 @@ function PizzaCard({ pizza }: { pizza: Pizza }) {
 						</span>
 					</div>
 					<span className="text-2xl font-light text-primary">
-						₹{pizza.base_price}
+						₹{pizza.basePrice}
 					</span>
 				</div>
 				<div>

@@ -11,7 +11,7 @@ function Address() {
 				{isPending
 					? [...Array(5)].map((_, i) => <PizzaCardSkeleton key={i} />)
 					: addresses
-							?.sort((a, b) => Number(b.is_default) - Number(a.is_default))
+							?.sort((a, b) => Number(b.isDefault) - Number(a.isDefault))
 							.map((add) => <AddressCard key={add.id} address={add} />)}
 				<CreateAddressCard />
 			</div>

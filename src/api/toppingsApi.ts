@@ -12,10 +12,10 @@ export const toppingsApi = {
 			params: {
 				...(toppingCategory && { category: toppingCategory }),
 				...(vegetarianOnly !== undefined && {
-					vegetarian_only: vegetarianOnly,
+					vegetarianOnly,
 				}),
 				...(isAvailable !== undefined && {
-					is_available: isAvailable,
+					isAvailable,
 				}),
 			},
 		});

@@ -4,7 +4,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const sizesApi = {
 	fetchAllSizes: async (): Promise<Size[]> => {
-		const res = await api.get("/menu/sizes?available_only=true");
+		const res = await api.get("/menu/sizes?availableOnly=true");
 		return res.data;
 	},
 };

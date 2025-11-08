@@ -1,13 +1,13 @@
 export type Address = {
-	full_name: string;
-	phone_number: string;
+	fullName: string;
+	phoneNumber: string;
 	street: string;
 	city: string;
 	state: string;
-	postal_code: string;
+	postalCode: string;
 	country: string;
-	is_default: boolean;
+	isDefault: boolean;
 	id: string;
-	created_at: string;
-	user_id: string;
+	createdAt: string;
+	userId: string;
 };

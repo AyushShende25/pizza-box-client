@@ -11,12 +11,7 @@ import { useMergeCart } from "./cartApi";
 
 export const authApi = {
 	register: async (registerFormData: RegisterFormType) => {
-		const { firstName, lastName, ...rest } = registerFormData;
-		const res = await api.post("/auth/register", {
-			...rest,
-			first_name: firstName,
-			last_name: lastName,
-		});
+		const res = await api.post("/auth/register", registerFormData);
 		return res.data;
 	},
 	verify: async (token: string) => {

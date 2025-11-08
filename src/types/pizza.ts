@@ -4,14 +4,14 @@ export type Pizza = {
 	id: string;
 	name: string;
 	description: string;
-	base_price: string;
-	image_url: string;
-	is_available: boolean;
+	basePrice: string;
+	imageUrl: string;
+	isAvailable: boolean;
 	category: PizzaCategory;
 	featured: boolean;
-	default_toppings: Topping[];
-	created_at: string;
-	updated_at: string;
+	defaultToppings: Topping[];
+	createdAt: string;
+	updatedAt: string;
 };
 
 export const PIZZA_CATEGORY = {
