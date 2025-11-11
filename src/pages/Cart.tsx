@@ -36,11 +36,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { useCreateOrder } from "@/api/ordersApi";
 import AddressDisplay from "@/components/AddressDisplay";
+import { useCheckout, useVerifyPayment } from "@/api/paymentsApi";
+import { loadRazorpay } from "@/lib/razorpay";
+import { toast } from "sonner";
+import { PAYMENT_METHOD, type PaymentMethod } from "@/types/orders";
 
 function Cart() {
 	const { data: cart, isPending: cartLoading } = useFetchCart();
 	const clearCartMutation = useClearCart();
 	const createOrderMutation = useCreateOrder();
+	const checkoutPaymentMutation = useCheckout();
+	const verifyPaymentMutation = useVerifyPayment();
 	const { data: addresses, isPending: addressesLoading } = useFetchAddresses();
 	const { data: user, isPending: userPending } = useMe();
 	const [notes, setNotes] = useState<string>("");
@@ -53,6 +59,14 @@ function Cart() {
 	const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
 		null,
 	);
+
+	const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+		PAYMENT_METHOD.DIGITAL,
+	);
+
+	useEffect(() => {
+		loadRazorpay();
+	}, []);
 
 	useEffect(() => {
 		if (defaultAddress?.id && !selectedAddressId) {
@@ -73,6 +87,7 @@ function Cart() {
 
 	const handleCheckout = async () => {
 		if (!selectedAddressId || !cart) return;
+
 		const orderItems = cart.cartItems.map((item) => ({
 			quantity: item.quantity,
 			pizzaId: item.pizza.id,
@@ -80,16 +95,102 @@ function Cart() {
 			crustId: item.crust.id,
 			toppingsIds: item.toppings.map((t) => t.id),
 		}));
+
 		try {
-			await createOrderMutation.mutateAsync({
+			const order = await createOrderMutation.mutateAsync({
 				orderItems,
 				addressId: selectedAddressId,
 				notes,
+				paymentMethod,
 			});
-			await clearCartMutation.mutateAsync();
-			navigate("/orders");
+
+			if (paymentMethod === PAYMENT_METHOD.COD) {
+				toast.success("Order placed successfully. Pay on delivery.");
+				await clearCartMutation.mutateAsync();
+				navigate("/orders", { replace: true });
+				return;
+			}
+
+			await handleRazorpayCheckout(order.id, order.orderNo);
 		} catch (err) {
-			console.error("Order creation failed", err);
+			console.error("Checkout failed:", err);
+			toast.error("Failed to initiate checkout. Please try again.");
+		}
+	};
+
+	const handleRazorpayCheckout = async (orderId: string, orderNo: string) => {
+		const razorpayKey = import.meta.env.VITE_PUBLIC_RAZORPAY_KEY_ID;
+		if (!razorpayKey) {
+			toast.error("Payment configuration error. Please contact support.");
+			return;
+		}
+
+		const isLoaded = await loadRazorpay();
+		if (!isLoaded) {
+			toast.error(
+				"Payment system failed to load. Please check your connection and try again.",
+			);
+			return;
+		}
+
+		try {
+			const { payment } = await checkoutPaymentMutation.mutateAsync(orderId);
+
+			const options = {
+				key: razorpayKey,
+				amount: payment.amount * 100,
+				currency: payment.currency,
+				order_id: payment.razorpay_order_id,
+				name: "Pizza-Box",
+				description: `Order ${orderNo}`,
+				handler: async (response: any) => {
+					try {
+						toast.loading("Verifying payment...");
+
+						const {
+							razorpay_payment_id,
+							razorpay_order_id,
+							razorpay_signature,
+						} = response;
+
+						const verifyRes = await verifyPaymentMutation.mutateAsync({
+							paymentId: payment.id,
+							razorpayOrderId: razorpay_order_id,
+							razorpaySignature: razorpay_signature,
+							razorpayPaymentId: razorpay_payment_id,
+						});
+
+						if (verifyRes.success) {
+							toast.dismiss();
+							toast.success("Payment successful!");
+							await clearCartMutation.mutateAsync();
+							navigate("/orders", { replace: true });
+						} else {
+							toast.dismiss();
+							toast.error(
+								"Payment verification failed. Please contact support.",
+							);
+							navigate("/orders");
+						}
+					} catch (err) {
+						toast.dismiss();
+						console.error("Payment verification error:", err);
+						toast.error("Payment verification failed. Please contact support.");
+						navigate("/orders");
+					}
+				},
+				prefill: {
+					name: user?.firstName ?? "",
+					email: user?.email ?? "",
+					contact: selectedAddress?.phoneNumber ?? "",
+				},
+				theme: { color: "#F37254" },
+			};
+
+			new (window as any).Razorpay(options).open();
+		} catch (err) {
+			console.error("Razorpay checkout failed:", err);
+			toast.error("Unable to start payment. Please try again.");
 		}
 	};
 
@@ -335,6 +436,31 @@ function Cart() {
 									placeholder="extra delivery instructions"
 								/>
 							</div>
+
+							<Separator />
+							<RadioGroup
+								value={paymentMethod}
+								onValueChange={(value) =>
+									setPaymentMethod(value as PaymentMethod)
+								}
+							>
+								<div className="flex items-center space-x-2">
+									<RadioGroupItem
+										value={PAYMENT_METHOD.DIGITAL}
+										id={PAYMENT_METHOD.DIGITAL}
+									/>
+									<Label htmlFor={PAYMENT_METHOD.DIGITAL}>
+										Pay Online (UPI/Card)
+									</Label>
+								</div>
+								<div className="flex items-center space-x-2">
+									<RadioGroupItem
+										value={PAYMENT_METHOD.COD}
+										id={PAYMENT_METHOD.COD}
+									/>
+									<Label htmlFor={PAYMENT_METHOD.COD}>Cash on Delivery</Label>
+								</div>
+							</RadioGroup>
 
 							<Separator />
 

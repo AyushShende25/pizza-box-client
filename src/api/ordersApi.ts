@@ -1,4 +1,9 @@
-import type { Order, OrderStatus, PaymentStatus } from "@/types/orders";
+import type {
+	Order,
+	OrderStatus,
+	PaymentMethod,
+	PaymentStatus,
+} from "@/types/orders";
 import { api } from "./axios";
 import {
 	infiniteQueryOptions,
@@ -23,6 +28,7 @@ type OrderCreate = {
 		crustId: string;
 		toppingsIds: string[];
 	}[];
+	paymentMethod: PaymentMethod;
 };
 
 export const ordersApi = {

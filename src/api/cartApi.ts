@@ -71,7 +71,7 @@ export function useAddToCart() {
 				if (!old) return old;
 				return {
 					...old,
-					item_count: old.itemCount + addToCartData.quantity,
+					itemCount: old.itemCount + addToCartData.quantity,
 				};
 			});
 
@@ -123,8 +123,8 @@ export function useUpdateCartQuantity() {
 
 				return {
 					...old,
-					cart_items: updatedItems,
-					item_count: itemCount,
+					cartItems: updatedItems,
+					itemCount: itemCount,
 					subtotal: subtotal.toFixed(2),
 					tax: tax.toFixed(2),
 					total: total.toFixed(2),
@@ -162,8 +162,8 @@ export function useRemoveItemFromCart() {
 				const total = subtotal + Number(old.deliveryCharge) + tax;
 				return {
 					...old,
-					cart_items: updatedItems,
-					item_count: old.itemCount - (removedItem?.quantity ?? 0),
+					cartItems: updatedItems,
+					itemCount: old.itemCount - (removedItem?.quantity ?? 0),
 					subtotal: subtotal.toFixed(2),
 					tax: tax.toFixed(2),
 					total: total.toFixed(2),
@@ -192,8 +192,8 @@ export function useClearCart() {
 
 				return {
 					...old,
-					item_count: 0,
-					cart_items: [],
+					itemCount: 0,
+					cartItems: [],
 				};
 			});
 			return { previousCart };

@@ -20,8 +20,7 @@ export type PaymentStatus =
 
 export const PAYMENT_METHOD = {
 	COD: "cod",
-	CARD: "card",
-	UPI: "upi",
+	DIGITAL: "digital",
 } as const;
 
 export type PaymentMethod =

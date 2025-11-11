@@ -94,7 +94,7 @@ export function useUpdateDefaultAddress() {
 				if (!old) return old;
 				return old.map((item) => ({
 					...item,
-					is_default: item.id === addressId,
+					isDefault: item.id === addressId,
 				}));
 			});
 
