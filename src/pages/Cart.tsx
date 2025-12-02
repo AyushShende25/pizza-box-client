@@ -105,7 +105,6 @@ function Cart() {
 			});
 
 			if (paymentMethod === PAYMENT_METHOD.COD) {
-				toast.success("Order placed successfully. Pay on delivery.");
 				await clearCartMutation.mutateAsync();
 				navigate("/orders", { replace: true });
 				return;
@@ -145,7 +144,7 @@ function Cart() {
 				description: `Order ${orderNo}`,
 				handler: async (response: any) => {
 					try {
-						toast.loading("Verifying payment...");
+						const toastid = toast.loading("Verifying payment...");
 
 						const {
 							razorpay_payment_id,
@@ -161,15 +160,11 @@ function Cart() {
 						});
 
 						if (verifyRes.success) {
-							toast.dismiss();
-							toast.success("Payment successful!");
+							toast.dismiss(toastid);
 							await clearCartMutation.mutateAsync();
 							navigate("/orders", { replace: true });
 						} else {
-							toast.dismiss();
-							toast.error(
-								"Payment verification failed. Please contact support.",
-							);
+							toast.dismiss(toastid);
 							navigate("/orders");
 						}
 					} catch (err) {

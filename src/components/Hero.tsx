@@ -51,7 +51,7 @@ function Hero() {
 						</div>
 						<div className="flex items-center gap-2">
 							<Truck className="w-4 h-4 text-primary" />
-							<span>Free delivery over $25</span>
+							<span>Free delivery for orders worth ₹100 or more</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<Star className="w-4 h-4 fill-primary text-primary" />
