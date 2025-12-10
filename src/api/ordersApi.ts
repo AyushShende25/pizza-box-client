@@ -32,18 +32,12 @@ type OrderCreate = {
 };
 
 export const ordersApi = {
-	fetchMyOrders: async ({
-		page,
-		limit,
-		paymentStatus,
-		orderStatus,
-	}: FetchOrdersProps = {}): Promise<Order[]> => {
-		const params = new URLSearchParams();
-		if (page) params.append("page", String(page));
-		if (limit) params.append("limit", String(limit));
-		if (orderStatus) params.append("orderStatus", orderStatus);
-		if (paymentStatus) params.append("paymentStatus", paymentStatus);
-		const res = await api.get(`/orders/my-orders?${params.toString()}`);
+	fetchMyOrders: async (
+		fetchOrderParams: FetchOrdersProps = {},
+	): Promise<Order[]> => {
+		const res = await api.get("/orders/my-orders", {
+			params: fetchOrderParams,
+		});
 		return res.data;
 	},
 	createNewOrder: async (orderCreate: OrderCreate): Promise<Order> => {

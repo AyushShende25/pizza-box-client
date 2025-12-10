@@ -20,23 +20,15 @@ type FetchPizzaProps = {
 };
 
 export const pizzasApi = {
-	fetchAllPizzas: async ({
-		limit,
-		page,
-		sortBy,
-		category,
-		name,
-		isAvailable = true,
-	}: FetchPizzaProps = {}): Promise<PizzaListResponse> => {
-		const query = new URLSearchParams({
-			...(limit && { limit: String(limit) }),
-			...(page !== undefined && { page: String(page) }),
-			...(sortBy && { sortBy }),
-			...(category && { category }),
-			...(name && { name }),
-			...(isAvailable !== undefined && { isAvailable: String(isAvailable) }),
+	fetchAllPizzas: async (
+		fetchPizzaProps: FetchPizzaProps = {},
+	): Promise<PizzaListResponse> => {
+		const res = await api.get("/menu/pizzas", {
+			params: {
+				...fetchPizzaProps,
+				isAvailable: true,
+			},
 		});
-		const res = await api.get(`/menu/pizzas?${query}`);
 		return res.data;
 	},
 	fetchFeaturedPizzas: async (): Promise<PizzaListResponse> => {
