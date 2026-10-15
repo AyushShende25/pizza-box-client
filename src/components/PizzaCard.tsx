@@ -20,7 +20,7 @@ function PizzaCard({ pizza }: { pizza: Pizza }) {
 	return (
 		<Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ">
 			<CardHeader className="relative">
-				{pizza.category === "veg" ? (
+				{pizza.foodType === "veg" ? (
 					<Badge className="absolute right-4 top-0 bg-green-500">veg</Badge>
 				) : (
 					<Badge variant="destructive" className="absolute right-4 top-0">

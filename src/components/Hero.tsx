@@ -9,7 +9,7 @@ function Hero() {
 		<section className="relative bg-gradient-to-r from-orange-100 to-orange-50 py-12 md:py-20">
 			<div className="container mx-auto px-6 md:grid md:grid-cols-2 md:gap-12 items-center">
 				{/* TEXT CONTENT */}
-				<article className="flex flex-col justify-center gap-4">
+				<article className="flex flex-col justify-center gap-6">
 					<Badge className="-mb-4" variant={"destructive"}>
 						<Flame size={14} /> <span>Authentic Italian Recipes</span>
 					</Badge>
@@ -23,28 +23,18 @@ function Hero() {
 					</p>
 
 					{/* BUTTONS */}
-					<div className="flex flex-col sm:flex-row gap-4 mt-4">
+					<Link to="/menu">
 						<Button
 							size="lg"
-							className="text-lg cursor-pointer hover:scale-105 transition-transform"
+							className="text-lg cursor-pointer hover:scale-105 transition-transform w-full"
 							aria-label="Order pizza now"
 						>
 							Order Now
 						</Button>
-						<Link to="/menu">
-							<Button
-								variant="outline"
-								size="lg"
-								className="text-lg cursor-pointer"
-								aria-label="View our menu"
-							>
-								View Menu
-							</Button>
-						</Link>
-					</div>
+					</Link>
 
 					{/* FEATURES */}
-					<div className="flex flex-wrap gap-6 text-sm text-muted-foreground mt-6">
+					<div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
 						<div className="flex items-center gap-2">
 							<Clock className="w-4 h-4 text-primary" />
 							<span>30 min delivery</span>

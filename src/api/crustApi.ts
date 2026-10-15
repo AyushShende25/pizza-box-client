@@ -4,7 +4,7 @@ import type { Crust } from "@/types/crust";
 
 export const crustsApi = {
 	fetchAllCrusts: async (): Promise<Crust[]> => {
-		const res = await api.get("/menu/crusts?availableOnly=true");
+		const res = await api.get("/menu/crusts?is_available=true");
 		return res.data;
 	},
 };

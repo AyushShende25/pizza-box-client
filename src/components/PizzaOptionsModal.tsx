@@ -33,8 +33,7 @@ function PizzaOptionsModal({
 		() =>
 			toppings?.filter(
 				(t) =>
-					!defaultToppings?.some((d) => d.id === t.id) &&
-					t.isVegetarian === true,
+					!defaultToppings?.some((d) => d.id === t.id) && t.foodType === "veg",
 			) ?? [],
 		[toppings, defaultToppings],
 	);
@@ -44,7 +43,7 @@ function PizzaOptionsModal({
 			toppings?.filter(
 				(t) =>
 					!defaultToppings?.some((d) => d.id === t.id) &&
-					t.isVegetarian === false,
+					t.foodType === "non_veg",
 			) ?? [],
 		[toppings, defaultToppings],
 	);
@@ -66,7 +65,9 @@ function PizzaOptionsModal({
 	const addToCartMutation = useAddToCart();
 
 	const handleAddToCart = async () => {
-		if (!selectedSizeId || !selectedCrustId) return;
+		if (!selectedSizeId || !selectedCrustId) {
+			return;
+		}
 		await addToCartMutation.mutateAsync({
 			pizzaId,
 			sizeId: selectedSizeId,
@@ -86,12 +87,16 @@ function PizzaOptionsModal({
 		);
 
 		const selectedToppingsPrice =
-			selectedToppings?.reduce((acc, curr) => acc + Number(curr.price), 0) ?? 0;
+			selectedToppings?.reduce(
+				(acc, curr) => acc + Number(curr.priceModifier),
+				0,
+			) ?? 0;
 
 		if (selectedSize && selectedCrust) {
 			total =
-				Number(selectedSize.multiplier) * Number(basePrice) +
-				Number(selectedCrust.additionalPrice) +
+				Number(basePrice) +
+				Number(selectedSize.priceModifier) +
+				Number(selectedCrust.priceModifier) +
 				selectedToppingsPrice;
 		}
 
@@ -150,8 +155,6 @@ function PizzaOptionsModal({
 					onValueChange={(v) => setSelectedSizeId(v)}
 				>
 					{sizes?.map((size) => {
-						const additionalPrice =
-							size.multiplier * Number(basePrice) - Number(basePrice);
 						return (
 							<div
 								key={size.id}
@@ -164,11 +167,10 @@ function PizzaOptionsModal({
 								>
 									<div className="flex w-full justify-between items-center">
 										<span className="font-medium">{size.displayName}</span>
-										{additionalPrice > 0 && (
-											<span className="text-sm text-muted-foreground">
-												+₹{additionalPrice.toFixed(0)}
-											</span>
-										)}
+
+										<span className="text-sm text-muted-foreground">
+											+₹{size.priceModifier}
+										</span>
 									</div>
 								</Label>
 							</div>
@@ -196,11 +198,10 @@ function PizzaOptionsModal({
 							>
 								<div className="w-full flex justify-between items-center">
 									<span className="font-medium">{crust.name}</span>
-									{Number(crust.additionalPrice) > 0 && (
-										<span className="text-sm text-muted-foreground">
-											+₹{crust.additionalPrice}
-										</span>
-									)}
+
+									<span className="text-sm text-muted-foreground">
+										+₹{crust.priceModifier}
+									</span>
 								</div>
 							</Label>
 						</div>
@@ -235,7 +236,7 @@ function PizzaOptionsModal({
 									<div className="w-full flex justify-between items-center">
 										<span>{topping.name}</span>
 										<span className="text-sm text-muted-foreground">
-											+₹{topping.price}
+											+₹{topping.priceModifier}
 										</span>
 									</div>
 								</Label>
@@ -272,7 +273,7 @@ function PizzaOptionsModal({
 									<div className="w-full flex justify-between items-center">
 										<span>{topping.name}</span>
 										<span className="text-sm text-muted-foreground">
-											+₹{topping.price}
+											+₹{topping.priceModifier}
 										</span>
 									</div>
 								</Label>

@@ -1,22 +1,22 @@
 import type { Topping, ToppingCategory } from "@/types/topping";
 import { api } from "./axios";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import type { FoodType } from "@/types/pizza";
+
+type FetchToppingsProps = {
+	category?: ToppingCategory;
+	foodType?: FoodType;
+	isAvailable?: boolean;
+};
 
 export const toppingsApi = {
 	fetchAllToppings: async (
-		toppingCategory?: ToppingCategory,
-		vegetarianOnly?: boolean,
-		isAvailable: boolean = true,
+		fetchToppingsProps: FetchToppingsProps = {},
 	): Promise<Topping[]> => {
 		const res = await api.get("/menu/toppings", {
 			params: {
-				...(toppingCategory && { category: toppingCategory }),
-				...(vegetarianOnly !== undefined && {
-					vegetarianOnly,
-				}),
-				...(isAvailable !== undefined && {
-					isAvailable,
-				}),
+				...fetchToppingsProps,
+				isAvailable: true,
 			},
 		});
 		return res.data;

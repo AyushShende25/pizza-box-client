@@ -15,9 +15,14 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import useDebounce from "@/hooks/useDebounce";
-import { PIZZA_CATEGORY, type PizzaCategory } from "@/types/pizza";
+import {
+	FOOD_TYPE,
+	type FoodType,
+	type SortField,
+	type SortOrder,
+} from "@/types/pizza";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import { useInView } from "react-intersection-observer";
 import { useSearchParams } from "react-router";
 
@@ -29,9 +34,10 @@ function Menu() {
 	const { data, isFetchingNextPage, hasNextPage, fetchNextPage, isPending } =
 		useInfiniteQuery(
 			fetchPizzasQueryOptions({
-				category: (searchParams.get("category") as PizzaCategory) ?? undefined,
+				foodType: (searchParams.get("foodType") as FoodType) ?? undefined,
 				name: debouncedSearchValue,
-				sortBy: searchParams.get("sort_by") ?? undefined,
+				sortBy: (searchParams.get("sortBy") as SortField) ?? "created_at",
+				order: (searchParams.get("order") as SortOrder) ?? "desc",
 			}),
 		);
 
@@ -42,12 +48,25 @@ function Menu() {
 	}, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	const handleChange = (key: string, value: string) => {
+		console.log(`called again ${key}, ${value}`);
+
 		const params = new URLSearchParams(searchParams);
 		if (value) {
 			params.set(key, value);
 		} else {
 			params.delete(key);
 		}
+
+		setSearchParams(params);
+	};
+
+	const handleSortChange = (value: string) => {
+		const [field, order] = value.split(":");
+
+		const params = new URLSearchParams(searchParams);
+
+		params.set("sortBy", field);
+		params.set("order", order);
 
 		setSearchParams(params);
 	};
@@ -68,17 +87,17 @@ function Menu() {
 				<CardContent className="flex flex-col md:flex-row gap-6 md:gap-10 justify-between items-center">
 					<RadioGroup
 						className="flex-1"
-						defaultValue={searchParams.get("category") ?? ""}
-						onValueChange={(v) => handleChange("category", v)}
+						value={searchParams.get("foodType") ?? ""}
+						onValueChange={(v) => handleChange("foodType", v)}
 					>
 						<h4 className="">Dietery Preference</h4>
 						<div className="flex gap-4">
 							<div className="flex items-center space-x-2">
-								<RadioGroupItem value={PIZZA_CATEGORY.VEG} id="option-one" />
+								<RadioGroupItem value={FOOD_TYPE.VEG} id={useId()} />
 								<Label htmlFor="option-one">Vegeterian Only</Label>
 							</div>
 							<div className="flex items-center space-x-2">
-								<RadioGroupItem value={PIZZA_CATEGORY.NONVEG} id="option-two" />
+								<RadioGroupItem value={FOOD_TYPE.NONVEG} id={useId()} />
 								<Label htmlFor="option-two">Non-Vegeterian</Label>
 							</div>
 						</div>
@@ -90,8 +109,8 @@ function Menu() {
 						placeholder="search with pizza-name"
 					/>
 					<Select
-						defaultValue={searchParams.get("sort_by") ?? ""}
-						onValueChange={(v) => handleChange("sort_by", v)}
+						value={`${searchParams.get("sortBy") ?? "created_at"}:${searchParams.get("order") ?? "desc"}`}
+						onValueChange={handleSortChange}
 					>
 						<SelectTrigger className="flex-1 w-full">
 							<SelectValue placeholder="sort" />
@@ -104,6 +123,12 @@ function Menu() {
 								</SelectItem>
 								<SelectItem value="base_price:desc">
 									Price: High to Low
+								</SelectItem>
+								<SelectItem value="name:asc">Name: ASC</SelectItem>
+								<SelectItem value="name:desc">Name: DESC</SelectItem>
+								<SelectItem value="created_at:asc">Created At: ASC</SelectItem>
+								<SelectItem value="created_at:desc">
+									Created At: DESC
 								</SelectItem>
 							</SelectGroup>
 						</SelectContent>

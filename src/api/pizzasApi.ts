@@ -1,6 +1,6 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { api } from "@/api/axios";
-import type { Pizza, PizzaCategory } from "@/types/pizza";
+import type { FoodType, Pizza, SortField, SortOrder } from "@/types/pizza";
 
 type PizzaListResponse = {
 	items: Pizza[];
@@ -13,9 +13,10 @@ type PizzaListResponse = {
 type FetchPizzaProps = {
 	page?: number;
 	limit?: number;
-	sortBy?: string;
+	sortBy?: SortField;
+	order?: SortOrder;
 	name?: string;
-	category?: PizzaCategory;
+	foodType?: FoodType;
 	isAvailable?: boolean;
 };
 
@@ -32,7 +33,7 @@ export const pizzasApi = {
 		return res.data;
 	},
 	fetchFeaturedPizzas: async (): Promise<PizzaListResponse> => {
-		const res = await api.get("/menu/pizzas?featured=true");
+		const res = await api.get("/menu/pizzas?isFeatured=true");
 		return res.data;
 	},
 };
