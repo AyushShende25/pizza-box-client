@@ -86,19 +86,12 @@ function Cart() {
 		!createOrderMutation.isPending;
 
 	const handleCheckout = async () => {
-		if (!selectedAddressId || !cart) return;
-
-		const orderItems = cart.cartItems.map((item) => ({
-			quantity: item.quantity,
-			pizzaId: item.pizza.id,
-			sizeId: item.size.id,
-			crustId: item.crust.id,
-			toppingsIds: item.toppings.map((t) => t.id),
-		}));
+		if (!selectedAddressId || !cart) {
+			return;
+		}
 
 		try {
 			const order = await createOrderMutation.mutateAsync({
-				orderItems,
 				addressId: selectedAddressId,
 				notes,
 				paymentMethod,

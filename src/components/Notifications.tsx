@@ -17,7 +17,7 @@ import { cn, getTimeAgo } from "@/lib/utils";
 import type { Notification } from "@/types/notifications";
 
 function Notifications() {
-	const { data } = useSuspenseQuery(fetchNotificationsQueryOptions());
+	const { data } = useSuspenseQuery(fetchNotificationsQueryOptions({}));
 
 	const markAsReadMutation = useMarkAsRead();
 

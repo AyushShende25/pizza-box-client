@@ -5,7 +5,8 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { api } from "./axios";
-import { TAX_RATE, type Cart } from "@/types/cart";
+import type { Cart } from "@/types/cart";
+import { toast } from "sonner";
 
 type AddToCartProps = {
 	pizzaId: string;
@@ -63,22 +64,8 @@ export function useAddToCart() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: cartApi.addToCart,
-		onMutate: async (addToCartData) => {
-			await queryClient.cancelQueries({ queryKey: ["cart"] });
-			const previousCart = queryClient.getQueryData<Cart>(["cart"]);
-
-			queryClient.setQueryData<Cart>(["cart"], (old) => {
-				if (!old) return old;
-				return {
-					...old,
-					itemCount: old.itemCount + addToCartData.quantity,
-				};
-			});
-
-			return { previousCart };
-		},
-		onError: (_err, _variables, context) => {
-			queryClient.setQueryData(["cart"], context?.previousCart);
+		onError: () => {
+			toast.error("Error adding items to cart");
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -90,51 +77,8 @@ export function useUpdateCartQuantity() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: cartApi.updateQuantity,
-		onMutate: async ({ itemId, quantity }) => {
-			await queryClient.cancelQueries({ queryKey: ["cart"] });
-			const previousCart = queryClient.getQueryData<Cart>(["cart"]);
-
-			queryClient.setQueryData<Cart>(["cart"], (old) => {
-				if (!old) return old;
-				const updatedItems = old.cartItems.map((item) => {
-					if (item.id === itemId) {
-						const unitPrice = Number(item.total) / item.quantity;
-						const newTotal = unitPrice * quantity;
-						return {
-							...item,
-							quantity,
-							total: newTotal.toFixed(2),
-						};
-					}
-					return item;
-				});
-				const itemCount = updatedItems.reduce(
-					(sum, item) => sum + item.quantity,
-					0,
-				);
-
-				const subtotal = updatedItems.reduce(
-					(sum, item) => sum + Number(item.total ?? 0),
-					0,
-				);
-
-				const tax = subtotal * TAX_RATE;
-				const total = subtotal + Number(old.deliveryCharge) + tax;
-
-				return {
-					...old,
-					cartItems: updatedItems,
-					itemCount: itemCount,
-					subtotal: subtotal.toFixed(2),
-					tax: tax.toFixed(2),
-					total: total.toFixed(2),
-				};
-			});
-
-			return { previousCart };
-		},
-		onError: (_err, _variables, context) => {
-			queryClient.setQueryData(["cart"], context?.previousCart);
+		onError: () => {
+			toast.error("Error updating quantity");
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -146,33 +90,8 @@ export function useRemoveItemFromCart() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: cartApi.removeItemFromCart,
-		onMutate: async (itemId) => {
-			await queryClient.cancelQueries({ queryKey: ["cart"] });
-			const previousCart = queryClient.getQueryData<Cart>(["cart"]);
-
-			queryClient.setQueryData<Cart>(["cart"], (old) => {
-				if (!old) return old;
-				const updatedItems = old.cartItems.filter((i) => i.id !== itemId);
-				const removedItem = old.cartItems.find((i) => i.id === itemId);
-				const subtotal = updatedItems.reduce(
-					(sum, item) => sum + Number(item.total ?? 0),
-					0,
-				);
-				const tax = subtotal * TAX_RATE;
-				const total = subtotal + Number(old.deliveryCharge) + tax;
-				return {
-					...old,
-					cartItems: updatedItems,
-					itemCount: old.itemCount - (removedItem?.quantity ?? 0),
-					subtotal: subtotal.toFixed(2),
-					tax: tax.toFixed(2),
-					total: total.toFixed(2),
-				};
-			});
-			return { previousCart };
-		},
-		onError: (_err, _variables, context) => {
-			queryClient.setQueryData(["cart"], context?.previousCart);
+		onError: () => {
+			toast.error("Error removing quantity");
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -184,22 +103,8 @@ export function useClearCart() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: cartApi.clearCart,
-		onMutate: async () => {
-			await queryClient.cancelQueries({ queryKey: ["cart"] });
-			const previousCart = queryClient.getQueryData<Cart>(["cart"]);
-			queryClient.setQueryData<Cart>(["cart"], (old) => {
-				if (!old) return old;
-
-				return {
-					...old,
-					itemCount: 0,
-					cartItems: [],
-				};
-			});
-			return { previousCart };
-		},
-		onError: (_err, _variables, context) => {
-			queryClient.setQueryData(["cart"], context?.previousCart);
+		onError: () => {
+			toast.error("Error clearing cart items");
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -211,11 +116,11 @@ export async function useMergeCart() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: cartApi.mergeGuestCart,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["cart"] });
-		},
 		onError: (err) => {
 			console.error("Cart merge failed", err);
+			toast.error("Error merging guest cart");
+		},
+		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
 		},
 	});

@@ -16,18 +16,12 @@ type FetchOrdersProps = {
 	limit?: number;
 	orderStatus?: OrderStatus;
 	paymentStatus?: PaymentStatus;
+	paymentMethod?: PaymentMethod;
 };
 
 type OrderCreate = {
 	addressId: string;
 	notes?: string;
-	orderItems: {
-		quantity: number;
-		pizzaId: string;
-		sizeId: string;
-		crustId: string;
-		toppingsIds: string[];
-	}[];
 	paymentMethod: PaymentMethod;
 };
 

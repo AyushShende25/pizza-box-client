@@ -102,9 +102,19 @@ function OrderCard({ order }: { order: Order }) {
 				<div className="text-muted-foreground space-y-1">
 					<div className="flex gap-2 items-start">
 						<MapPin className="size-4 mt-[2px]" />
-						<p className="text-sm leading-snug whitespace-pre-line break-words">
-							{order.deliveryAddress}
-						</p>
+						<div className="text-sm leading-snug whitespace-pre-line break-words flex flex-col">
+							<span>{order.deliveryName}</span>
+							<div className="space-x-2">
+								<span>{order.deliveryStreet}</span>
+								<span>{order.deliveryCity}</span>
+								<span>{order.deliveryState}</span>
+								<span>{order.deliveryCountry}</span>
+							</div>
+							<div className="space-x-2">
+								<span>{order.deliveryPostalCode}</span>
+								<span>{order.deliveryPhone}</span>
+							</div>
+						</div>
 					</div>
 				</div>
 
